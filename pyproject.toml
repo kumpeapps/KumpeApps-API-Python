@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "kumpeapi"
+version = "0.0.1alpha1"
+license = "GPL-3.0"
+authors = [
+  { name="Justin Kumpe", email="jakumpe@kumpes.com" },
+]
+description = "Helper Files"
+readme = "README.md"
+requires-python = ">=3.7"
+repository = "https://github.com/kumpeapps/KumpeApps-API-Python"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU GPLv3 License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  'requests',
+  'json',
+  'pymysql',
+  'datetime',
+  'flask'
+]
