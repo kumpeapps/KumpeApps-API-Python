@@ -101,13 +101,7 @@ class kapi:
 
     def get_user_info(self, username):
         if self.mysql_creds['username'] != '':
-            db = pymysql.connect(
-                db='Core_KumpeApps',
-                user=self.mysql_creds['username'],
-                passwd=self.mysql_creds['password'],
-                host='sql.kumpedns.us',
-                port=3306
-                )
+            db = self.mysql_connect()
             cursor = db.cursor(
                 pymysql.cursors.DictCursor
                 )
@@ -122,13 +116,7 @@ class kapi:
 
     def get_authkey_info(self, auth_key):
         if self.mysql_creds['username'] != '':
-            db = pymysql.connect(
-                db='Core_KumpeApps',
-                user=self.mysql_creds['username'],
-                passwd=self.mysql_creds['password'],
-                host='sql.kumpedns.us',
-                port=3306
-                )
+            db = self.mysql_connect()
             cursor = db.cursor(pymysql.cursors.DictCursor)
             sql = "SELECT * FROM %s WHERE 1=1 AND auth_key = %s;"
             cursor.execute(sql, ('Core_RESTAPI.v5__vw_Auth_Keys', auth_key,))
@@ -141,13 +129,7 @@ class kapi:
 
     def get_user_info_byid(self, user_id):
         if self.mysql_creds['username'] != '':
-            db = pymysql.connect(
-                db='Core_KumpeApps',
-                user=self.mysql_creds['username'],
-                passwd=self.mysql_creds['password'],
-                host='sql.kumpedns.us',
-                port=3306
-                )
+            db = self.mysql_connect()
             cursor = db.cursor(pymysql.cursors.DictCursor)
             sql = "SELECT * FROM vw_am_user WHERE 1=1 AND user_id = %s;"
             cursor.execute(sql, (user_id,))
@@ -173,13 +155,7 @@ class kapi:
         if self.mysql_creds['username'] != '':
             today = date.today()
             yesterday = today - datetime.timedelta(days=1)
-            db = pymysql.connect(
-                db='Core_KumpeApps',
-                user=self.mysql_creds['username'],
-                passwd=self.mysql_creds['password'],
-                host='sql.kumpedns.us',
-                port=3306
-                )
+            db = self.mysql_connect()
             cursor = db.cursor(pymysql.cursors.DictCursor)
             sql = """SELECT access_id, expire_date FROM
             Core_KumpeApps.am_access WHERE 1=1
@@ -233,13 +209,7 @@ class kapi:
     def access_log_insert(self, user_id, referrer, url):
         if self.mysql_creds['username'] != '':
             ip = request.environ['HTTP_X_FORWARDED_FOR']
-            db = pymysql.connect(
-                db='Core_KumpeApps',
-                user=self.mysql_creds['username'],
-                passwd=self.mysql_creds['password'],
-                host='sql.kumpedns.us',
-                port=3306
-                )
+            db = self.mysql_connect()
             cursor = db.cursor(pymysql.cursors.DictCursor)
             sql = """INSERT INTO
             `am_access_log`(`user_id`, `time`, `url`, `remote_addr`,
@@ -300,3 +270,13 @@ class kapi:
             return link+'?token='+authToken
         else:
             raise PermissionError("MySQL Creds required for this function")
+
+    def mysql_connect(self):
+        db = pymysql.connect(
+            db='Core_KumpeApps',
+            user=self.mysql_creds['username'],
+            passwd=self.mysql_creds['password'],
+            host='sql.kumpedns.us',
+            port=3306
+            )
+        return db
