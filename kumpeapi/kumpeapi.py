@@ -130,7 +130,7 @@ class kapi:
                 port=3306
                 )
             cursor = db.cursor(pymysql.cursors.DictCursor)
-            sql = f"SELECT * FROM %s WHERE 1=1 AND auth_key = %s;"
+            sql = "SELECT * FROM %s WHERE 1=1 AND auth_key = %s;"
             cursor.execute(sql, ('Core_RESTAPI.v5__vw_Auth_Keys', auth_key,))
             results = cursor.fetchone()
             cursor.close()
