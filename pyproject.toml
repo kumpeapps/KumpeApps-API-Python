@@ -9,7 +9,7 @@ license = "GPL-3.0"
 authors = [
   { name="Justin Kumpe", email="jakumpe@kumpes.com" },
 ]
-description = "Helper Files"
+description = "KumpeAPI Functions"
 readme = "README.md"
 requires-python = ">=3.7"
 repository = "https://github.com/kumpeapps/KumpeApps-API-Python"
