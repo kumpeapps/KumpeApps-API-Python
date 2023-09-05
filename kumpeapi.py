@@ -1,17 +1,18 @@
-import pymysql
+"""Module for KumpeApps API Functions"""
 from datetime import date
 import datetime
-import requests
-from flask import request
-import string
 import random
+import string
+from flask import request
+import pymysql
+import requests
 
-
-class kapi:
+class KAPI:
+    """KumpeApps API Functions"""
     def __init__(
         self,
         apikey: str,
-        mysql_creds={'username': '', 'password': ''}
+        mysql_creds=None
     ):
         self.apikey = apikey
         self.mysql_creds = mysql_creds
@@ -25,6 +26,7 @@ class kapi:
         last_name,
         comment="Added via API"
     ):
+        """Creates new user on the KumpeApps System"""
         data = {
             "_key": self.apikey,
             "login": username,
@@ -36,7 +38,8 @@ class kapi:
             }
         response = requests.post(
             'https://www.kumpeapps.com/api/users',
-            data=data
+            data=data,
+            timeout=10
             )
         return response.json()
 
@@ -50,6 +53,7 @@ class kapi:
         master_id,
         comment="Added via API"
     ):
+        """Create new sub/child user on the KumpeApps System"""
         data = {
             "_key": self.apikey,
             "login": username,
@@ -61,11 +65,13 @@ class kapi:
             "subusers_parent_id": master_id}
         response = requests.post(
             'https://www.kumpeapps.com/api/users',
-            data=data
+            data=data,
+            timeout=10
             )
         return response.json()
 
     def authenticate_user(self, username, password):
+        """Authenticate user credentials on KumpeApps"""
         data = {
             "_key": self.apikey,
             "login": username,
@@ -73,7 +79,8 @@ class kapi:
             }
         response = requests.get(
             'https://www.kumpeapps.com/api/check-access/by-login-pass',
-            params=data
+            params=data,
+            timeout=10
             )
         return response.json()
 
@@ -85,6 +92,7 @@ class kapi:
         expire_date='2037-12-31',
         comment='Added via API'
     ):
+        """Add product/access to user on KumpeApps"""
         data = {
             "_key": self.apikey,
             "user_id": user_id,
@@ -95,68 +103,75 @@ class kapi:
             }
         response = requests.post(
             'https://www.kumpeapps.com/api/access',
-            data=data
+            data=data,
+            timeout=10
             )
         return response.json()
 
     def get_user_info(self, username):
-        if self.mysql_creds['username'] != '':
-            db = self.mysql_connect()
-            cursor = db.cursor(
+        """Get user info from KumpeApps"""
+        if self.mysql_creds is None:
+            database = self.mysql_connect()
+            cursor = database.cursor(
                 pymysql.cursors.DictCursor
                 )
             sql = "SELECT * FROM vw_am_user WHERE 1=1 AND login = %s;"
             cursor.execute(sql, (username,))
             results = cursor.fetchone()
             cursor.close()
-            db.close()
+            database.close()
             return results
         else:
             raise PermissionError("MySQL Creds required for this function")
 
     def get_authkey_info(self, auth_key):
-        if self.mysql_creds['username'] != '':
-            db = self.mysql_connect()
-            cursor = db.cursor(pymysql.cursors.DictCursor)
+        """Get info from auth_key"""
+        if self.mysql_creds is None:
+            database = self.mysql_connect()
+            cursor = database.cursor(pymysql.cursors.DictCursor)
             sql = "SELECT * FROM %s WHERE 1=1 AND auth_key = %s;"
             cursor.execute(sql, ('Core_RESTAPI.v5__vw_Auth_Keys', auth_key,))
             results = cursor.fetchone()
             cursor.close()
-            db.close()
+            database.close()
             return results
         else:
             raise PermissionError("MySQL Creds required for this function")
 
     def get_user_info_byid(self, user_id):
-        if self.mysql_creds['username'] != '':
-            db = self.mysql_connect()
-            cursor = db.cursor(pymysql.cursors.DictCursor)
+        """Get User Info by user_id"""
+        if self.mysql_creds is None:
+            database = self.mysql_connect()
+            cursor = database.cursor(pymysql.cursors.DictCursor)
             sql = "SELECT * FROM vw_am_user WHERE 1=1 AND user_id = %s;"
             cursor.execute(sql, (user_id,))
             results = cursor.fetchone()
             cursor.close()
-            db.close()
+            database.close()
             return results
         else:
             raise PermissionError("MySQL Creds required for this function")
 
     def delete_user(self, user_id):
+        """Delete User from KumpeApps"""
         data = {
             "_key": self.apikey,
             "_method": "DELETE"
             }
         response = requests.post(
             f'https://www.kumpeapps.com/api/users/{user_id}',
-            data=data
+            data=data,
+            timeout=10
             )
         return response.json()
 
     def expire_access(self, user_id, product_id, comment="Expired via API"):
-        if self.mysql_creds['username'] != '':
+        """Set access/product expiration date to yesterday"""
+        if self.mysql_creds is None:
             today = date.today()
             yesterday = today - datetime.timedelta(days=1)
-            db = self.mysql_connect()
-            cursor = db.cursor(pymysql.cursors.DictCursor)
+            database = self.mysql_connect()
+            cursor = database.cursor(pymysql.cursors.DictCursor)
             sql = """SELECT access_id, expire_date FROM
             Core_KumpeApps.am_access WHERE 1=1
             AND user_id = %s AND product_id = %s AND
@@ -164,7 +179,7 @@ class kapi:
             cursor.execute(sql, (user_id, product_id))
             results = cursor.fetchall()
             cursor.close()
-            db.close()
+            database.close()
             if not results:
                 return
             for access in results:
@@ -176,7 +191,8 @@ class kapi:
                     }
                 requests.put(
                     f'https://www.kumpeapps.com/api/access/{access_id}',
-                    data=data
+                    data=data,
+                    timeout=10
                     )
             return
         else:
@@ -191,6 +207,7 @@ class kapi:
         last_name,
         comment="Updated via API"
     ):
+        """Update User on KumpeApps"""
         data = {
             "_key": self.apikey,
             "_method": "PUT",
@@ -202,20 +219,22 @@ class kapi:
             }
         response = requests.post(
             f'https://www.kumpeapps.com/api/users/{user_id}',
-            data=data
+            data=data,
+            timeout=10
             )
         return response
 
     def access_log_insert(self, user_id, referrer, url):
-        if self.mysql_creds['username'] != '':
-            ip = request.environ['HTTP_X_FORWARDED_FOR']
-            db = self.mysql_connect()
-            cursor = db.cursor(pymysql.cursors.DictCursor)
+        """Insert into KumpeApps access log"""
+        if self.mysql_creds is None:
+            ip_address = request.environ['HTTP_X_FORWARDED_FOR']
+            database = self.mysql_connect()
+            cursor = database.cursor(pymysql.cursors.DictCursor)
             sql = """INSERT INTO
             `am_access_log`(`user_id`, `time`, `url`, `remote_addr`,
             `referrer`) VALUES (%s,now(),%s,%s,%s)"""
-            cursor.execute(sql, (user_id, url, ip, referrer, ))
-            db.commit()
+            cursor.execute(sql, (user_id, url, ip_address, referrer, ))
+            database.commit()
             cursor.close()
             return
         else:
@@ -233,17 +252,18 @@ class kapi:
         scope4="none",
         kiosk=0
     ):
-        if self.mysql_creds['username'] != '':
+        """Create Auth Link for KHome"""
+        if self.mysql_creds is None:
             randomstring = string.ascii_letters + string.digits
-            authToken = ''.join(random.choice(randomstring) for i in range(10))
-            db = pymysql.connect(
+            auth_token = ''.join(random.choice(randomstring) for i in range(10))
+            database = pymysql.connect(
                 db='Web_KumpeHome',
                 user=self.mysql_creds['username'],
                 passwd=self.mysql_creds['password'],
                 host='sql.kumpedns.us',
                 port=3306
                 )
-            cursor = db.cursor(pymysql.cursors.DictCursor)
+            cursor = database.cursor(pymysql.cursors.DictCursor)
             sql = """INSERT INTO `Web_KumpeHome`.`AuthenticatedLinks`
             (`master_id`,`authenticated_user_id`,`link_user_id`,`link`,
             `expiration`,`token`,`scope`,`scope2`,`scope3`,`scope4`,
@@ -256,7 +276,7 @@ class kapi:
                     auth_user_id,
                     link_user_id,
                     link,
-                    authToken,
+                    auth_token,
                     scope,
                     scope2,
                     scope3,
@@ -264,19 +284,20 @@ class kapi:
                     kiosk,
                     )
                 )
-            db.commit()
+            database.commit()
             cursor.close()
-            db.close()
-            return link+'?token='+authToken
+            database.close()
+            return link+'?token='+auth_token
         else:
             raise PermissionError("MySQL Creds required for this function")
 
     def mysql_connect(self):
-        db = pymysql.connect(
+        """Connect to MySQL"""
+        database = pymysql.connect(
             db='Core_KumpeApps',
             user=self.mysql_creds['username'],
             passwd=self.mysql_creds['password'],
             host='sql.kumpedns.us',
             port=3306
             )
-        return db
+        return database
