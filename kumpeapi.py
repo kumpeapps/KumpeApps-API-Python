@@ -110,7 +110,7 @@ class KAPI:
 
     def get_user_info(self, username):
         """Get user info from KumpeApps"""
-        if self.mysql_creds is None:
+        if self.mysql_creds is not None:
             database = self.mysql_connect()
             cursor = database.cursor(
                 pymysql.cursors.DictCursor
@@ -126,7 +126,7 @@ class KAPI:
 
     def get_authkey_info(self, auth_key):
         """Get info from auth_key"""
-        if self.mysql_creds is None:
+        if self.mysql_creds is not None:
             database = self.mysql_connect()
             cursor = database.cursor(pymysql.cursors.DictCursor)
             sql = "SELECT * FROM %s WHERE 1=1 AND auth_key = %s;"
@@ -140,7 +140,7 @@ class KAPI:
 
     def get_user_info_byid(self, user_id):
         """Get User Info by user_id"""
-        if self.mysql_creds is None:
+        if self.mysql_creds is not None:
             database = self.mysql_connect()
             cursor = database.cursor(pymysql.cursors.DictCursor)
             sql = "SELECT * FROM vw_am_user WHERE 1=1 AND user_id = %s;"
@@ -167,7 +167,7 @@ class KAPI:
 
     def expire_access(self, user_id, product_id, comment="Expired via API"):
         """Set access/product expiration date to yesterday"""
-        if self.mysql_creds is None:
+        if self.mysql_creds is not None:
             today = date.today()
             yesterday = today - datetime.timedelta(days=1)
             database = self.mysql_connect()
@@ -226,7 +226,7 @@ class KAPI:
 
     def access_log_insert(self, user_id, referrer, url):
         """Insert into KumpeApps access log"""
-        if self.mysql_creds is None:
+        if self.mysql_creds is not None:
             ip_address = request.environ['HTTP_X_FORWARDED_FOR']
             database = self.mysql_connect()
             cursor = database.cursor(pymysql.cursors.DictCursor)
@@ -253,7 +253,7 @@ class KAPI:
         kiosk=0
     ):
         """Create Auth Link for KHome"""
-        if self.mysql_creds is None:
+        if self.mysql_creds is not None:
             randomstring = string.ascii_letters + string.digits
             auth_token = ''.join(random.choice(randomstring) for i in range(10))
             database = pymysql.connect(
