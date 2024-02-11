@@ -12,10 +12,17 @@ class KAPI:
     def __init__(
         self,
         apikey: str,
-        mysql_creds=None
+        mysql_creds=None,
+        preprod: bool = True
     ):
         self.apikey = apikey
         self.mysql_creds = mysql_creds
+        self.preprod = preprod
+        self.base_url = 'https:/www.kumpeapps.com/api'
+        self.sql_url = 'sql.kumpedns.us'
+        if preprod:
+            self.base_url = 'https://www.preprod.kumpeapps.com/api'
+            self.sql_url = 'preprod.kumpedns.us'
 
     def create_user(
         self,
@@ -37,7 +44,7 @@ class KAPI:
             "comment": comment
             }
         response = requests.post(
-            'https://www.kumpeapps.com/api/users',
+            f'{self.base_url}/users',
             data=data,
             timeout=10
             )
@@ -64,7 +71,7 @@ class KAPI:
             "comment": comment,
             "subusers_parent_id": master_id}
         response = requests.post(
-            'https://www.kumpeapps.com/api/users',
+            f'{self.base_url}/users',
             data=data,
             timeout=10
             )
@@ -78,7 +85,7 @@ class KAPI:
             "pass": password
             }
         response = requests.get(
-            'https://www.kumpeapps.com/api/check-access/by-login-pass',
+            f'{self.base_url}/check-access/by-login-pass',
             params=data,
             timeout=10
             )
@@ -102,7 +109,7 @@ class KAPI:
             "comment": comment
             }
         response = requests.post(
-            'https://www.kumpeapps.com/api/access',
+            f'{self.base_url}/access',
             data=data,
             timeout=10
             )
@@ -159,7 +166,7 @@ class KAPI:
             "_method": "DELETE"
             }
         response = requests.post(
-            f'https://www.kumpeapps.com/api/users/{user_id}',
+            f'{self.base_url}/users/{user_id}',
             data=data,
             timeout=10
             )
@@ -190,7 +197,7 @@ class KAPI:
                     "comment": comment
                     }
                 requests.put(
-                    f'https://www.kumpeapps.com/api/access/{access_id}',
+                    f'{self.base_url}/access/{access_id}',
                     data=data,
                     timeout=10
                     )
@@ -218,7 +225,7 @@ class KAPI:
             "comment": comment
             }
         response = requests.post(
-            f'https://www.kumpeapps.com/api/users/{user_id}',
+            f'{self.base_url}/users/{user_id}',
             data=data,
             timeout=10
             )
@@ -297,7 +304,7 @@ class KAPI:
             db='Core_KumpeApps',
             user=self.mysql_creds['username'],
             passwd=self.mysql_creds['password'],
-            host='sql.kumpedns.us',
+            host=self.sql_url,
             port=3306
             )
         return database
