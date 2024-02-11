@@ -249,6 +249,25 @@ class KAPI:
             )
         return response
 
+    def update_user_field(
+        self,
+        user_id: int,
+        field: str,
+        value: str
+    ):
+        """Update User Field on KumpeApps"""
+        data = {
+            "_key": self.apikey,
+            "_method": "PUT",
+            field: value
+            }
+        response = requests.post(
+            f'{self.base_url}/users/{user_id}',
+            data=data,
+            timeout=10
+            )
+        return response
+
     def access_log_insert(self, user_id, referrer, url):
         """Insert into KumpeApps access log"""
         if self.mysql_creds is not None:
