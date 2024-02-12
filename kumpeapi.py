@@ -18,7 +18,7 @@ class KAPI:
         self.apikey = apikey
         self.mysql_creds = mysql_creds
         self.preprod = preprod
-        self.base_url = 'https:/www.kumpeapps.com/api'
+        self.base_url = 'https://www.kumpeapps.com/api'
         self.sql_url = 'sql.kumpedns.us'
         if preprod:
             self.base_url = 'https://www.preprod.kumpeapps.com/api'
