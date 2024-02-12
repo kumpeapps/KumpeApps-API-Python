@@ -7,7 +7,7 @@ name = "kumpeapi"
 version = "1.0.7"
 license = "GPL-3.0"
 authors = [
-  { name="Justin Kumpe", email="jakumpe@kumpes.com" },
+  { name="KumpeApps LLC", email="jakumpe@kumpes.com" },
 ]
 description = "KumpeAPI Functions"
 readme = "README.md"
