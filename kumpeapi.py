@@ -13,7 +13,7 @@ class KAPI:
         self,
         apikey: str,
         mysql_creds=None,
-        preprod: bool = True
+        preprod: bool = False
     ):
         self.apikey = apikey
         self.mysql_creds = mysql_creds
